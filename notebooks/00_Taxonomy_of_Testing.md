@@ -12,7 +12,7 @@ jupyter:
     name: conda-env-.conda-testing-tutorial-py
 ---
 
-# Property Based Testing 101
+# Traversing the Taxonomy of Testing
 
 
 We expect your to write your to write pytest-style tests, which is exemplified by `test_count_vowels`, which can be found below.
@@ -55,7 +55,7 @@ def test_count_vowels():
 <!-- #region -->
 <div class="alert alert-info">
 
-**Exercise: Writ**
+**Exercise: Writing Manual Tests**
 
 The following tests should be placed in `tests/s0_pbt_101/test_manual.py`.
 
@@ -174,7 +174,7 @@ def test_inequality(a, b, c):
 
 **Exercise: Running a Parameterized Test**
 
-Create the file `tests/test_parameterized_examples.py`.
+Create the file `tests/test_parameterized.py`.
 Add the parameterized tests `test_range_length` and `test_inequality`, which are defined above,
 and run them.
 </div>
@@ -204,6 +204,106 @@ This is a place where the ["black" auto-formatter](https://black.readthedocs.io/
 Black will make all of these formatting decisions for us - we can write our parameterized tests as haphazardly as we like and simply run black to format our code. This is also a huge help with writing tests with Hypothesis, as you will see
 </div>
 
+
+<!-- #region -->
+## Interlude: A Brief Intro to Hypothesis
+
+It is often the case that the process of *describing our data* is by far the heaviest burden that we must bear when writing tests. This process of assessing "what variety of values should I test?", "have I thought of all the important edge-cases?", and "how much is 'enough'?" will crop up with nearly every test that we write.
+Indeed, these are questions that you may have been asking yourself when writing `test_count_vowels_basic` and `test_merge_max_mappings` in the previous sections of this module.
+
+[Hypothesis](https://hypothesis.readthedocs.io/) is a powerful Python library that empowers us to write a _description_ (specification, to be more precise) of the data that we want to use to exercise our test.
+It will then *generate* test cases that satisfy this description and will run our test on these cases.
+Let's witness this in its most basic form.
+
+The following is the basic anatomy of a Hypothesis test:
+
+```python
+from hypothesis import given
+import hypothesis.strategies as st
+
+@given(x=st.integers())
+def a_test_using_hypothesis(x):
+    # x will be any integer
+    # use `x` to test your function
+    ...
+```
+
+The `@given` decorator is to be fed one or more *Hypothesis strategies* for describing data.
+In this example, we specified a single strategy, which describes arbitrary integer values.
+Executing `a_test_using_hypothesis()` will prompt Hypothesis to run the test's body _multiple times_ (100 times, by default); for run draws a new set of values from the strategies that we provided to `@given`.
+
+Let's write a simple example to help us see this behavior clearly:
+
+```python
+saves_numbers = []
+
+@given(x=st.integers())
+def a_test_using_hypothesis(x):
+    saves_numbers.append(x)
+```
+
+Now, we execute the function and inspect the contents of the list `saves_numbers`, which gets mutated (appended to) each time the body of the function is run
+
+```python
+# unlike a pytest-parameterized test, tests using hypothesis
+# can be run outside of the pytest framework
+>>> a_test_using_hypothesis()  # tells hypothesis to run the test body 100 times
+>>> len(saves_numbers)
+100
+
+# Note that statistics will vary from run-to-run
+>>> min(saves_numbers)
+-147572478458337740506626060645758832445
+>>> max(saves_numbers)
+117191644382309356634160262916607663738
+>>> sorted(saves_numbers)[50]  # median
+50
+```
+
+There is a [whole suite of strategies](https://hypothesis.readthedocs.io/en/latest/data.html) available for describing various sorts of data with Hypothesis.
+We will dive into the process of describing data in rich ways using these in the next section.
+Prior to doing so, we will use our nascent understanding of Hypothesis to round out the taxonomy of tests, and study fuzz tests and property-based tests.
+<!-- #endregion -->
+
+<!-- #region -->
+## Fuzzing
+
+Fuzz testing is a simple, but often (embarrassingly) powerful approach to automated testing in which we feed a function a wide variety of randomly-generated inputs to see if it ever crashes.
+For example, the following test "fuzzes" the `int` type with finite float inputs, to see if `int(<finite-float>)` ever causes a crash.
+
+```python
+@given(x=st.floats(allow_infinity=False, allow_nan=False))
+def test_fuzz_in_with_finite_floats(x):
+    int(x)  # no asserts needed!
+```
+
+while this test doesn't do much to assure us that `int` casts floats _correctly_, it is nonetheless a very simple and expressive test that gives us confidence that feeding a finite float will never cause `int` to crash.
+We should appreciate just how trivial it is to write this test.
+
+Fuzzing can be especially useful if we have our source code with internal internal `assert` statements.
+Seeing that these assertions hold true even when our function is being fed truly bizarre and exotic (but valid!) input data helps close the aperture on where future bugs are coming from – we can at least be confident that they aren't coming from incorrect assertions.
+
+([Seriously! Fuzzing can be very effective](https://github.com/google/oss-fuzz))
+<!-- #endregion -->
+
+<div class="alert alert-info">
+
+**Exercise: Running a Parameterized Test**
+
+Create the file `tests/test_fuzz.py`.
+Use the Hypothesis strategies [text(](https://hypothesis.readthedocs.io/en/latest/data.html#hypothesis.strategies.text) and [booleans()](https://hypothesis.readthedocs.io/en/latest/data.html#hypothesis.strategies.booleans) to fuzz the `count_vowels` function.
+    
+Consider temporarily adding a print statement to your test to get a peek at the sort of data that you are fuzzing your function with.
+    
+The more inputs you feed a function in a fuzz test, the better. Take a glance at the documentation for [Hypothesis' settings](https://hypothesis.readthedocs.io/en/latest/settings.html) and increase the number of examples run in your fuzz test from 100 to 1,000.
+</div>
+
+
+
+
+
+
+## Property-Based Tests
 
 <!-- #region -->
 ## Extra: Test-Driven Development
