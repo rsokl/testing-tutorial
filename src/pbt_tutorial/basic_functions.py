@@ -1,4 +1,4 @@
-from typing import Dict, Union
+from typing import Dict
 
 __all__ = ["count_vowels", "merge_max_mappings"]
 
@@ -69,3 +69,37 @@ def merge_max_mappings(
         if key not in merged or value > merged[key]:
             merged[key] = value
     return merged
+
+
+# EXTRA: Test-drive development
+
+
+def leftpad(string: str, width: int, fillchar: str) -> str:
+    """Left-pads `string` with `fillchar` until the resulting string
+    has length `width`.
+
+    Parameters
+    ----------
+    string : str
+        The input string
+
+    width : int
+        A non-negative integer specifying the minimum guaranteed
+        width of the left-padded output string.
+
+    fillchar : str
+        The character (length-1 string) used to pad the string.
+
+    Examples
+    --------
+    The following is the intended behaviour of this function:
+
+    >>> leftpad('cat', width=5, fillchar="Z")
+    'ZZcat'
+    >>> leftpad('Dog', width=2, fillchar="Z")
+    'Dog'
+    """
+    assert isinstance(width, int) and width >= 0, width
+    assert isinstance(fillchar, str) and len(fillchar) == 1, fillchar
+    margin = max(width - len(string), 0)
+    return margin * fillchar + string

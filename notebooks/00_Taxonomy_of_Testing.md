@@ -291,7 +291,7 @@ Seeing that these assertions hold true even when our function is being fed truly
 **Exercise: Running a Parameterized Test**
 
 Create the file `tests/test_fuzz.py`.
-Use the Hypothesis strategies [text(](https://hypothesis.readthedocs.io/en/latest/data.html#hypothesis.strategies.text) and [booleans()](https://hypothesis.readthedocs.io/en/latest/data.html#hypothesis.strategies.booleans) to fuzz the `count_vowels` function.
+Use the Hypothesis strategies [text()](https://hypothesis.readthedocs.io/en/latest/data.html#hypothesis.strategies.text) and [booleans()](https://hypothesis.readthedocs.io/en/latest/data.html#hypothesis.strategies.booleans) to fuzz the `count_vowels` function.
     
 Consider temporarily adding a print statement to your test to get a peek at the sort of data that you are fuzzing your function with.
     
@@ -303,19 +303,196 @@ The more inputs you feed a function in a fuzz test, the better. Take a glance at
 
 
 
+Fuzzing is convenient and powerful because it enables us to run diverse inputs into our function without requiring us to figure out what the respective outputs of our function should be.
+That being said, testing that your function simply doesn't crash doesn't tell us much about whether or not the function is actually doing its job.
+We'll see that property-based testing can help us test the correctness of our code while maintaining much of the simplicity and verbosity of a fuzz-style test.
+
+
 ## Property-Based Tests
 
+Property-based testing (PBT) also enables us to exercise our function with a diverse set of inputs and without knowing precisely what the corresponding outputs should be. But, unlike with fuzz testing, these tests will check that our code behaves correctly beyond not-crashing.
+Here we will identify properties that should be satisfied by our function and we will test that each of these properties hold for a broad and diverse set of inputs to our function.
 
+Just as Hypothesis' strategies enable us to fuzz-test our code with highly diverse inputs, they will serve to drive our property-based tests as well.
+
+As an example, let's write some property-based tests for Python's `sorted` function and make sure that it properly sorts lists of integers & floats correctly along with lists of strings.
+
+<!-- #region -->
+```python
+from collections import Counter
+
+from hypothesis import given
+import hypothesis.strategies as st
+
+
+@given(
+    arg=st.one_of(
+        st.lists(st.integers() | st.floats(allow_nan=False)), # nans aren't orderable
+        st.lists(st.text()),
+    )
+)
+def test_sorted_property_based(arg):
+    result = sorted(arg)
+    
+    # Property 1:
+    # Check that entries of `result` are in ascending order.
+    for a, b in zip(result, result[1:]):
+        assert a <= b
+    
+    # Property 2:
+    # Check that `result` and `arg` contain the same elements,
+    # disregarding their order
+    assert Counter(result) == Counter(arg)
+```
+<!-- #endregion -->
+
+<!-- #region -->
+This is a simple but powerful test!
+Because we are using Hypothesis to generate the inputs to this test, we are exercising `sorted` with lists of varying lengths (including empty lists), of all redundant entries, containing positive and negative infinities, and so on.
+Furthermore, we were able to identify two simple properties that, taken together, assure that `result` is indeed a sorted list.
+Put another way, any manual test that we could write for `sorted` would be redundant with the assurances provided to us by `test_sorted_property_based`.
+Lastly, consider how much more tedious and brittle it would be to write parameterized test that exercises a comparably-diverse set of inputs and desired outputs! 
+
+It is important to note that property-based testing does not require you to identify a "complete" set of properties that fully guarantee correctness in our code.
+Let's consider the following property-based test of our `count_vowels` function:
+
+```python
+@given(
+    in_string=st.text(alphabet=string.printable, max_size=20),
+    include_y=st.booleans(),
+    num_repeat=st.integers(0, max_value=100),
+)
+def test_count_vowels_property_based(in_string: str, include_y: bool, num_repeat: int):
+    num_vowels = count_vowels(in_string, include_y)
+    
+    # Property 1:
+    # `num_vowels` must be non-negative and cannot
+    # exceed the length of the string itself
+    assert 0 <= num_vowels <= len(in_string)
+
+    # Property 2:
+    # `N * in_string` must have N-times as many
+    # vowels as `in_string`
+    assert count_vowels(num_repeat * in_string, include_y) == num_repeat * num_vowels
+
+    # Property 3:
+    # The vowel count should be invariant to the string's ordering
+    # Note: We can use hypothesis to shuffle our string here, but
+    #       that will require use of a more advanced feature that 
+    #       we will learn about later.
+    assert count_vowels(in_string[::-1], include_y) == num_vowels
+    assert count_vowels("".join(sorted(in_string)), include_y) == num_vowels
+
+    # Property 4:
+    # Vowel count is case-insensitive
+    assert count_vowels(in_string.upper(), include_y) == num_vowels
+    assert count_vowels(in_string.lower(), include_y) == num_vowels
+```
+
+Testing these properties alone shouldn't make us confident that `count_vowels` is behaving as expected; after all, we never actually verify that the vowel count is exactly correct.
+But testing these properties *alongside some manual test cases* is a **very** powerful combination.
+
+Consider the following smattering of manual tests:
+
+```python
+@pytest.mark.parametrize(
+    "input_string, include_y, expected_count",
+    [
+        ("aA bB yY", False, 2),
+        ("aA bB yY", True, 4),
+        ("123bacediouyz", False, 5),
+        ("b a c e d i o u y z", True, 6),
+    ],
+)
+def test_count_vowels_parameterized(
+    input_string: str, include_y: bool, expected_count: int
+):
+    assert count_vowels(input_string, include_y) == expected_count
+```
+
+These manual test cases are far from exhaustive, but when viewed in conjunction with the properties that we tested above, we suddenly realize that `count_vowels` is being tested quite thoroughly!
+Take some time to reflect on how much more expressive each of these test cases become when we have the additional assurance that they also satisfy the properties tested above.
+It should be clear that we aren't explicitly testing that the properties hold for these parameterized cases, but given that Hypothesis is generating *much* more diverse (and plentiful) examples in our PBT, we can be confident that the properties hold for our manual cases as well. 
+<!-- #endregion -->
+
+<!-- #region -->
+<div class="alert alert-info">
+
+**Exercise: Running a Hypothesis-Driven, Property-Based Test**
+
+Create the file `tests/test_properties.py` and add the `test_count_vowels_property_based` test to it.
+Are there any other properties that you might test?
+Run your test suite and verify that this test is run and that it passes.
+    
+Revisit the parameterized tests that you wrote for `count_vowels` and consider adding some additional cases that, in conjunction with these property based tests, will help improve our confidence in `count_vowels`.
+
+
+</div>
+
+
+
+
+<!-- #endregion -->
+
+<!-- #region -->
+<div class="alert alert-info">
+
+**Exercise: Writing Your Own Property-Based Test**
+
+Add to `tests/test_properties.py` a property-based test for `merge_max_mappings`.
+
+You can use the following strategy to generate dictionaries with strings as keys and numbers as values:
+    
+```python
+st.dictionaries(keys=st.text(), values=st.integers() | st.floats(include_nan=False))
+```
+    
+Can you identify a minimal and "complete" set of properties to test here? 
+
+</div>
+
+<!-- #endregion -->
 
 <!-- #region -->
 ## Extra: Test-Driven Development
 
 
-Using Hypothesis' [`text()` strategy](https://hypothesis.readthedocs.io/en/latest/data.html#hypothesis.strategies.text)
-<!-- #endregion -->
-
-
+We want to complete the following function:
 
 ```python
-
+def leftpad(string: str, width: int, fillchar: str) -> str:
+    """Left-pads `string` with `fillchar` until the resulting string
+    has length `width`.
+    
+    Parameters
+    ----------
+    string : str
+        The input string
+    
+    width : int
+        A non-negative integer specifying the minimum guaranteed
+        width of the left-padded output string.
+    
+    fillchar : str
+        The character (length-1 string) used to pad the string.
+    
+    Examples
+    --------
+    The following is the intended behaviour of this function:
+    
+    >>> leftpad('cat', width=5, fillchar="Z")
+    'ZZcat'
+    >>> leftpad('Dog', width=2, fillchar="Z")
+    'Dog'
+    """
+    assert isinstance(width, int) and width >= 0, width
+    assert isinstance(fillchar, str) and len(fillchar) == 1, fillchar
+    # YOUR CODE HERE
 ```
+
+But let's use test-driven development to do so.
+That is, include the above function stub in `pbt_tutorial/basic_function.py` (without completing the function) and then begin writing one or more property-based tests for it in `tests/test_properties.py`.
+From the outset your test should fail, since the function hasn't been implemented.
+
+Once you are satisfied with your property-based test for `leftpad`, proceed to complete your implementation of the function and use your test to drive your development (e.g. rely on it to tell you if you have gotten something wrong or have missed any edge cases). 
+<!-- #endregion -->
