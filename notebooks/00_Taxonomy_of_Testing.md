@@ -453,6 +453,32 @@ Can you identify a minimal and "complete" set of properties to test here?
 
 <!-- #endregion -->
 
+<div class="alert alert-info">
+
+**Exercise: Hypothesis, the automated CS tutor**
+
+Suppose that you were responsible for writing tests for Python's all-important [`range()`](https://docs.python.org/3/library/functions.html#func-range).
+Using Hypothesis, write a test that verifies the property that `len(range(size)) == size`, where `size` is any non-negative integer.
+
+Go ahead and write/run the test...
+
+.
+    
+.
+    
+.
+
+You may be surprised to find that `len(range(size)) == size` does *not* pass for arbitrary non-negative integers.
+Instead, this test reveals that the CPython implementation of the built-in `len` function is such that it can only handle non-negative integers smaller than $2^{63}$ (i.e. it will only allocate 64 bits to represent a signed integer - one bit is used to store the sign of the number).
+Hypothesis should have revealed this by generating the failing test case `size=9223372036854775808`, which is exactly $2^{63}$.
+
+Hypothesis has a knack for catching these sorts of unexpected edge cases!
+In fact, this overflow behavior is now documented in the CPython source code because it was discovered while writing this material 😄.
+Thus you can think of Hypothesis as your personal CS tutor.
+It will tell you things about Python that you never knew that you wanted to know.
+</div>
+
+
 <!-- #region -->
 ## Extra: Test-Driven Development
 
@@ -496,3 +522,12 @@ From the outset your test should fail, since the function hasn't been implemente
 
 Once you are satisfied with your property-based test for `leftpad`, proceed to complete your implementation of the function and use your test to drive your development (e.g. rely on it to tell you if you have gotten something wrong or have missed any edge cases). 
 <!-- #endregion -->
+```python
+@given(st.integers(0))
+def test_range(n):
+    assert len(range(n)) == n
+```
+
+```python
+test_range()
+```
