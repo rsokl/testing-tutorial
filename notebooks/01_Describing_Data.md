@@ -82,7 +82,7 @@ testing_booleans()
 ```
 
 <!-- #region -->
-### Drawing examples from strategies
+### Viewing examples drawn from strategies
 
 Hypothesis provides a useful mechanism for developing an intuition for the data produced by a strategy. A strategy, once initialized, has a `.example()` method that will randomly draw a representative value from the strategy. For example:
 
@@ -512,6 +512,90 @@ squares_or_cubes = st.tuples(squares, squares) | st.tuples(cubes, cubes, cubes)
 
 print_examples(squares_or_cubes, 5)
 # </COGINST>
+```
+
+<!-- #region -->
+### [`st.fixed_dictionaries()`](https://hypothesis.readthedocs.io/en/latest/data.html#hypothesis.strategies.fixed_dictionaries)
+
+`st.fixed_dictionaries` takes a mapping of the form `key -> strategy` and returns a strategy according to that mapping. E.g.
+
+```python
+# demonstrating st.fixed_dictionaries()
+>>> mapping = dict(age=st.integers(0, 89), height=st.floats(3, 7)
+>>> st.fixed_dictionaries(mapping).example()
+{'age': 7, 'height': 3.5}
+```
+
+will draw values that are either integers or list of integers. 
+<!-- #endregion -->
+
+<!-- #region -->
+### [`st.builds()`](https://hypothesis.readthedocs.io/en/latest/data.html#hypothesis.strategies.builds)
+
+`st.builds` is will "build" (call/instantiate) some target callable. `builds` is capable of inferring strategies based on the target's annotated signature, otherwise we can explicitly specify arguments for it to use. 
+
+```python
+# Defining a target for `st.builds`
+from dataclasses import dataclass
+
+@dataclass
+class C:
+    x: int
+    y: str
+```
+
+`builds` can either infer strategies to use, based on `C`'s type annotations:
+
+```python
+>>> st.builds(C).example()  # infers x->`st.integers()`, y->`st.text()`
+C(x=57, y='\U00108b39W\U000a55f5ÈwC\U0009db0a')
+```
+
+or we can explicitly specify one or more of the strategies for describing the target's parameters
+
+```python
+>>> st.builds(C, x=st.just(-1111)).example()
+C(x=-1111, y='A')
+```
+<!-- #endregion -->
+
+<div class="alert alert-info">
+
+**Exercise: Exploring additional strategies**
+
+Consult [Hypothesis' documentation](https://hypothesis.readthedocs.io/en/latest/data.html) 
+</div>
+
+
+```python
+from dataclasses import dataclass
+```
+
+```python
+@dataclass
+class C:
+    x: int
+    y: str
+```
+
+```python
+st.builds(C, x=st.just(-1111)).example()
+```
+
+```python
+def f(x, y): return (x, y)
+```
+
+```python
+st.builds(f, x=st.integers(), y=st.floats()).example()
+```
+
+```python
+st.fixed_dictionaries(dict(age=st.integers(0, 89), height=st.floats(3, 7))).example()
+```
+
+```python
+
 ```
 
 ```python
