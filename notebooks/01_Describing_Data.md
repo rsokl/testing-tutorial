@@ -5,11 +5,11 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.2'
-      jupytext_version: 1.9.1
+      jupytext_version: 1.5.0
   kernelspec:
-    display_name: Python [conda env:.conda-testing-tutorial]
+    display_name: Python [conda env:testing-tutorial]
     language: python
-    name: conda-env-.conda-testing-tutorial-py
+    name: conda-env-testing-tutorial-py
 ---
 
 # Describing Your Data with Hypothesis
@@ -315,7 +315,7 @@ Use `print_examples` to build an intuition for this strategy.
 
 **Exercise: Describing data with `st.lists`**
 
-Write a strategy that generates unique lists of even-valued integers, ranging from length-5 to length-10. 
+Write a strategy that generates unique **tuples** of even-valued integers, ranging from length-5 to length-10. 
 
 Write a test that checks these properties.
 
@@ -326,17 +326,18 @@ Write a test that checks these properties.
 # <COGINST>
 even_integers = st.integers().map(lambda x: 2 * x)
 
+strat = st.lists(even_integers, min_size=5, max_size=10, unique=True).map(tuple)
 
-@given(x=st.lists(even_integers, min_size=5, max_size=10, unique=True))
+@given(x=strat)
 def test_even_lists(x):
-    assert isinstance(x, list)
+    assert isinstance(x, tuple)
     assert 5 <= len(x) <= 10
     assert len(set(x)) == len(x)
     assert all(isinstance(i, int) for i in x)
     assert all(i % 2 == 0 for i in x)
 
 
-print_examples(st.lists(even_integers, min_size=5, max_size=10, unique=True), 3)
+print_examples(strat, 3)
 test_even_lists()
 # </COGINST>
 ```
@@ -529,10 +530,82 @@ print_examples(squares_or_cubes, 5)
 will draw values that are either integers or list of integers. 
 <!-- #endregion -->
 
+### [`st.sampled_from`](https://hypothesis.readthedocs.io/en/latest/data.html#hypothesis.strategies.sampled_from)
+
+Finally, [`st.sampled_from`](https://hypothesis.readthedocs.io/en/latest/data.html#hypothesis.strategies.sampled_from) accepts a collection of objects. The strategy will return values that are sampled from this collections.
+
+
+<div class="alert alert-info">
+
+**Exercise: Describing objects that evaluate to `False`**
+
+Write a strategy that can return the boolean, integer, float, string, list, tuple, or dictionary that evaluates to `False` (when called on by `bool`)
+
+Use `print_examples` to examine the behavior of your strategy.
+</div>
+
+
+```python
+# <COGINST>
+falsies = st.sampled_from([False, 0, 0.0, "", [], tuple(), {}])
+
+print_examples(falsies, 10)
+# </COGINST>
+```
+
+<!-- #region -->
+### [`st.from_type()`](https://hypothesis.readthedocs.io/en/latest/data.html#hypothesis.strategies.from_type)
+
+`st.from_type` looks up a strategy associated with a given type or type-annotation
+
+```python
+>>> st.from_type(int)
+integers()
+
+>>> from typing import List, Dict
+>>> st.from_type(List[int])
+lists(integers())
+
+>>> st.from_type(Dict[str, float])
+dictionaries(keys=text(), values=floats())
+```
+
+You can use `st.register_type_strategy` to add or override type -> strategy mappings used by `st.from_type`:
+
+```python
+import math
+
+class ComplexUnitCircle(complex): 
+    pass
+
+st.register_type_strategy(
+    ComplexUnitCircle,
+    st.floats(0, 2 * math.pi).map(lambda x: math.cos(x) + 1j * math.sin(x)),
+)
+```
+
+```python
+>>> st.from_type(ComplexUnitCircle).example()
+(0.7599735905063035-0.6499539535482165j)
+```
+
+`hypothesis.infer` can be used within `@given` to indicate that an argument's values should be inferred from the annotation from the test's signature.
+For example:
+
+```python
+from hypothesis import infer
+
+@given(x=infer) # uses `from_type(ComplexUnitCircle)`
+def test_with_infer(x: ComplexUnitCircle):
+    assert isinstance(x, complex)
+    assert math.isclose(abs(x), 1)
+```
+<!-- #endregion -->
+
 <!-- #region -->
 ### [`st.builds()`](https://hypothesis.readthedocs.io/en/latest/data.html#hypothesis.strategies.builds)
 
-`st.builds` is will "build" (call/instantiate) some target callable. `builds` is capable of inferring strategies based on the target's annotated signature, otherwise we can explicitly specify arguments for it to use. 
+`st.builds` is will "build" (call/instantiate) some target callable. `builds` is capable of inferring strategies based on the target's annotated signature (it uses `st.from_type` to do so), otherwise we can explicitly specify arguments for it to use. 
 
 ```python
 # Defining a target for `st.builds`
@@ -559,6 +632,55 @@ C(x=-1111, y='A')
 ```
 <!-- #endregion -->
 
+<!-- #region -->
+<div class="alert alert-info">
+
+**Exercise: Registering a Strategy for a Type**
+
+Given the following type
+    
+```python
+from dataclasses import dataclass
+
+@dataclass
+class Student:
+    age: int
+    letter_grade: str
+```
+
+register a Hypothesis strategy in association with it (via `register_type_strategy`) that draws ages from the domain `[10, 18]` and letter grades from A-F (no pluses or minuses).
+Next, write a test that draws a "class of students" (i.e. `List[Student]`), and use `hypothesis.infer` so that you don't have to write the strategy by-hand.
+In the body of the test, simply print the values generated to describe the class of students.
+</div>
+
+<!-- #endregion -->
+
+```python
+# <COGINST>
+from dataclasses import dataclass
+from typing import List
+
+from hypothesis import infer
+
+@dataclass
+class Student:
+    age: int
+    letter_grade: str
+
+
+st.register_type_strategy(
+    Student,
+    st.builds(Student, age=st.integers(10, 18), letter_grade=st.sampled_from("ABCDEF")),
+)
+
+@given(class_of_students=infer)
+def test_class(class_of_students: List[Student]):
+    print(class_of_students)
+
+test_class()
+# </COGINST>
+```
+
 <div class="alert alert-info">
 
 **Exercise: Exploring additional strategies**
@@ -567,27 +689,58 @@ Consult [Hypothesis' documentation](https://hypothesis.readthedocs.io/en/latest/
 </div>
 
 
-```python
-from dataclasses import dataclass
-```
+
+## Drawing From Strategies Within a Test
+
+We will often need to draw from a Hypothesis strategy in a context-dependent manner within our test. Suppose, for example, that we want to describe two lists of integers, but we want to be sure that the second list is longer than the first. [We can use the `st.data()` strategy to use strategies "interactively"](https://hypothesis.readthedocs.io/en/latest/data.html#drawing-interactively-in-tests) in this sort of way.
+
+Let's see it in action:
 
 ```python
-@dataclass
-class C:
-    x: int
-    y: str
+# We want two lists of integers, `x` and `y`, where we want `y` to be longer than `x`.
+
+@given(x=st.lists(st.integers()), data=st.data())
+def test_two_constrained_lists(x, data: st.DataObject):
+    y = data.draw(st.lists(st.integers(), min_size=len(x) + 1), label="y")
+
+    assert len(x) < len(y)
+
+
+test_two_constrained_lists()
 ```
 
-```python
-st.builds(C, x=st.just(-1111)).example()
-```
+The `given` operator is told to pass two things to our test: 
+
+ - `x`, which is a list of integers drawn from strategies
+ - `data`, which is an instance of the `st.DataObject` class; this instance is what gets drawn from the `st.data()` strategy
+
+The only thing that you need to know about `st.DataObject` is that it's `draw` method expects a hypothesis search strategy, and that it will immediately draw a value from said strategy during the test. You can also, optionally, pass a string to  `label` argument to the `draw` method. This simply permits you to provide a name for the item that was drawn, so that any stack-trace that your test produces is easy to interpret.
+
+
+<div class="alert alert-info">
+
+**Exercise: Drawing from a strategy interactively**
+
+Write a test that is fed a list (of varying length) of non-negative integers. Then, draw a **set** (i.e. a unique collection) of non-negative integers whose sum is at least as large as the sum of the list.
+The strategy [`st.sets`](https://hypothesis.readthedocs.io/en/latest/data.html#hypothesis.strategies.sets) will be useful for this.
+
+</div>
+
 
 ```python
-def f(x, y): return (x, y)
-```
+# <COGINST>
+@given(the_list=st.lists(st.integers(min_value=0)), data=st.data())
+def test_interactive_draw_skills(the_list, data):
+    the_set = data.draw(
+        st.sets(elements=st.integers(min_value=0)).filter(
+            lambda x: sum(x) >= sum(the_list)
+        )
+    )
+    assert sum(the_list) <= sum(the_set)
 
-```python
-st.builds(f, x=st.integers(), y=st.floats()).example()
+
+test_interactive_draw_skills()
+# </COGINST>
 ```
 
 ```python
