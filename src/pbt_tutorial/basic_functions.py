@@ -1,3 +1,4 @@
+import numpy as np
 from itertools import groupby
 from typing import Any, Dict, List, Union
 
@@ -152,3 +153,23 @@ def run_length_decoder(in_list: List[Union[str, int]]) -> str:
         else:
             out += item
     return out
+
+
+def pairwise_dists(x, y):
+    """ Computing pairwise Euclidean distance between the respective
+    row-vectors of `x` and `y`
+
+    Parameters
+    ----------
+    x : numpy.ndarray, shape=(M, D)
+    y : numpy.ndarray, shape=(N, D)
+
+    Returns
+    -------
+    numpy.ndarray, shape=(M, N)
+        The Euclidean distance between each pair of
+        rows between `x` and `y`."""
+    sqr_dists = -2 * np.matmul(x, y.T)
+    sqr_dists +=  np.sum(x**2, axis=1)[:, np.newaxis]
+    sqr_dists += np.sum(y**2, axis=1)
+    return np.sqrt(np.clip(sqr_dists, a_min=0, a_max=None))
