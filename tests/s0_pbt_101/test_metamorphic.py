@@ -53,3 +53,24 @@ def test_pairwise_dists_translational_invariance(M, N, D, data, shift):
     )
     dists = pairwise_dists(x, y)
     assert np.allclose(dists, pairwise_dists(x + shift, y + shift))
+
+
+@given(
+    M=st.integers(0, 5),
+    N=st.integers(0, 5),
+    D=st.integers(0, 5),
+    data=st.data(),
+    scale=st.floats(0, 100),
+)
+def test_pairwise_dists_linear_scaling(M, N, D, data, scale):
+    x = data.draw(
+        hnp.arrays(shape=(M, D), elements=st.floats(-1e20, 1e20), dtype=float)
+    )
+    y = data.draw(
+        hnp.arrays(shape=(N, D), elements=st.floats(-1e20, 1e20), dtype=float)
+    )
+    dists = pairwise_dists(x, y)
+    assert np.allclose(
+        scale * dists, pairwise_dists(x * scale, y * scale), atol=1e-5, rtol=1e-5
+    )
+

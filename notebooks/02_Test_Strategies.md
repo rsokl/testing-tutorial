@@ -261,11 +261,11 @@ In the case of a computer-vision algorithm, like an image classifier, this could
 **Exercise: Metamorphic testing**
 
 Create the file `tests/test_metamorphic.py`.
-For each of the following functions identify one or more metamorphic relationships that are exhibited by the function and test them.
+For each of the following functions identify one or more metamorphic relationships that are exhibited by the function and write tests that exercise them.
     
-- `merge_max_mappings`
 - [`numpy.clip`](https://numpy.org/doc/stable/reference/generated/numpy.clip.html)
-- `sorted` (don't test the fixed-point relationship; identify a different one)
+- `sorted` (don't test the fixed-point relationship; identify a different metamorphic relationship)
+- `merge_max_mappings`
 - `pairwise_dists` (defined below.. add this to `basic_functions.py`)
 
 ```python
@@ -291,5 +291,53 @@ def pairwise_dists(x, y):
     return np.sqrt(np.clip(sqr_dists, a_min=0, a_max=None))
 ```
 
+</div>
+<!-- #endregion -->
+
+<!-- #region -->
+<div class="alert alert-info">
+
+**Exercise: Testing the softmax function**
+
+The so-called "softmax" function is a means of normalizing a set of numbers such that **they will have the properties of a probability distribution**. I.e., post-softmax, each number will reside in $[0, 1]$ and the resulting numbers will sum to $1$.
+
+The softmax of a set of $M$ numbers is:
+
+\begin{equation}
+softmax([s_{k} ]_{k=1}^{M}) = \Bigl [ \frac{e^{s_k}}{\sum_{i=1}^{M}{e^{s_i}}} \Bigr ]_{k=1}^{M}
+\end{equation}
+
+```python
+>>> softmax([10., 10., 10.])
+array([0.33333333, 0.33333333, 0.33333333])
+
+>>> softmax([0., 10000., 0.])
+array([0., 1., 0.])
+
+>>> softmax([-100., 0., -100.])
+array([3.72007598e-44, 1.00000000e+00, 3.72007598e-44])
+```
+
+Write an implementation of `softmax` in `basic_functions.py` and test the two properties of `softmax` that we described above.
+Note: you should use `math.isclose` when checking if two floats are approximately equal.
+
+
+If you implemented `softmax` in a straight-forward way (i.e. you implemented the function based on the exact equation above) then you property-based test should fail.
+This is due to the use of the exponential function in `softmax`, which quickly creates a numerical instability.
+
+We can fix the numerical instability by recognizing a metamorphic relationship that is satisfied by the softmax equation: it exhibits translational invariance:
+
+\begin{align}
+softmax([s_{k} - a]_{k=1}^{M}) &= \Bigl [ \frac{e^{s_k - a}}{\sum_{i=1}^{M}{e^{s_i - a}}} \Bigr ]_{k=1}^{M}\\
+&= \Bigl [ \frac{e^{-a}e^{s_k}}{e^{-a}\sum_{i=1}^{M}{e^{s_i}}} \Bigr ]_{k=1}^{M}
+&= \Bigl [ \frac{e^{s_k}}{\sum_{i=1}^{M}{e^{s_i}}} \Bigr ]_{k=1}^{M}
+&= softmax([s_{k}]_{k=1}^{M})
+\end{align}
+
+Thus we can address this instability by finding the max value in our vector of number, subtracting that number from each of the values in the vector, and *then* compute the softmax.
+Update your definition of `softmax` and see that your property-based tests now pass.
+
+Reflect on the fact that using Hypothesis to drive a property-based test lead us to identify a subtle-but-critical oversight in our function.
+Had we simply manually tested our function with known small inputs and outputs, we might not have discovered this issue.
 </div>
 <!-- #endregion -->

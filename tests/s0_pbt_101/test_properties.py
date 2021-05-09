@@ -1,14 +1,20 @@
 import string
+from math import isclose
 from typing import Dict
 
 import hypothesis.strategies as st
+import numpy as np
 from hypothesis import given
 
 # EXTRA: Test-drive development
-from pbt_tutorial.basic_functions import (count_vowels, leftpad,
-                                          merge_max_mappings,
-                                          run_length_decoder,
-                                          run_length_encoder)
+from pbt_tutorial.basic_functions import (
+    count_vowels,
+    leftpad,
+    merge_max_mappings,
+    run_length_decoder,
+    run_length_encoder,
+    softmax,
+)
 
 
 @given(
@@ -74,8 +80,6 @@ def test_merge_max_mappings_hypothesis(dict1: Dict[str, int], dict2: Dict[str, i
     assert all(dict2[k] <= merged_dict[k] for k in dict2)
 
 
-
-
 @given(
     in_string=st.text(max_size=20),
     width=st.integers(0, 100),
@@ -96,3 +100,12 @@ def test_left_pad(in_string: str, width: int, fillchar: str):
 @given(st.text("abcd") | st.text())
 def test_run_length_compression_roundtrip(x):
     assert run_length_decoder(run_length_encoder(x)) == x
+
+
+@given(
+    st.lists(st.floats(allow_nan=False, allow_infinity=False), min_size=1).map(np.array)
+)
+def test_softmax_properties(x):
+    y = softmax(x)
+    assert all(0 <= i <= 1 for i in y), y
+    assert isclose(y.sum(), 1), y

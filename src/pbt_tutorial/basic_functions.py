@@ -173,3 +173,8 @@ def pairwise_dists(x, y):
     sqr_dists +=  np.sum(x**2, axis=1)[:, np.newaxis]
     sqr_dists += np.sum(y**2, axis=1)
     return np.sqrt(np.clip(sqr_dists, a_min=0, a_max=None))
+
+
+def softmax(x):
+    x = x - x.max()
+    return np.exp(x) / np.exp(x).sum()
