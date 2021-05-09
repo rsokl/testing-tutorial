@@ -1,4 +1,5 @@
-from typing import Dict
+from itertools import groupby
+from typing import Any, Dict, List, Union
 
 __all__ = ["count_vowels", "merge_max_mappings"]
 
@@ -73,7 +74,7 @@ def merge_max_mappings(
 
 # EXTRA: Test-drive development
 
-
+# SOLUTION
 def leftpad(string: str, width: int, fillchar: str) -> str:
     """Left-pads `string` with `fillchar` until the resulting string
     has length `width`.
@@ -103,3 +104,51 @@ def leftpad(string: str, width: int, fillchar: str) -> str:
     assert isinstance(fillchar, str) and len(fillchar) == 1, fillchar
     margin = max(width - len(string), 0)
     return margin * fillchar + string
+
+
+def safe_name(obj: Any, repr_allowed: bool=True) -> str:
+    """Tries to get a descriptive name for an object. Returns '<unknown>`
+    instead of raising - useful for writing descriptive/safe error messages."""
+    if hasattr(obj, "__qualname__"):
+        return obj.__qualname__
+
+    if hasattr(obj, "__name__"):
+        return obj.__name__
+
+    if repr_allowed and hasattr(obj, "__repr__"):
+        return repr(obj)
+
+    return "<unknown>"
+
+
+def run_length_encoder(in_string: str) -> List[Union[str, int]]:
+    """
+    >>> run_length_encoder("aaaaabbcbc")
+    ['a', 'a', 5, 'b', 'b', 2, 'c', 'b', 'c']
+    """
+    assert isinstance(in_string, str)
+    out = []
+    for item, group in groupby(in_string):
+        cnt = sum(1 for x in group)
+        if cnt == 1:
+            out.append(item)
+        else:
+            out.extend((item, item, cnt))
+    assert isinstance(out, list)
+    assert all(isinstance(x, (str, int)) for x in out)
+    return out
+
+
+# SOLUTION
+def run_length_decoder(in_list: List[Union[str, int]]) -> str:
+    """
+    >>> run_length_decoder(['a', 'a', 5, 'b', 'b', 2, 'c', 'b', 'c'])
+    "aaaaabbcbc"
+    """
+    out = ""
+    for n, item in enumerate(in_list):
+        if isinstance(item, int):
+            out += in_list[n - 1] * (item - 2)
+        else:
+            out += item
+    return out

@@ -1,10 +1,14 @@
 import string
-from pbt_tutorial import count_vowels, merge_max_mappings
-
 from typing import Dict
 
-from hypothesis import given
 import hypothesis.strategies as st
+from hypothesis import given
+
+# EXTRA: Test-drive development
+from pbt_tutorial.basic_functions import (count_vowels, leftpad,
+                                          merge_max_mappings,
+                                          run_length_decoder,
+                                          run_length_encoder)
 
 
 @given(
@@ -70,8 +74,6 @@ def test_merge_max_mappings_hypothesis(dict1: Dict[str, int], dict2: Dict[str, i
     assert all(dict2[k] <= merged_dict[k] for k in dict2)
 
 
-# EXTRA: Test-drive development
-from pbt_tutorial.basic_functions import leftpad
 
 
 @given(
@@ -89,3 +91,8 @@ def test_left_pad(in_string: str, width: int, fillchar: str):
         margin = width - len(in_string)
         assert set(padded[:margin]) == {fillchar}
         assert padded[margin:] == in_string
+
+
+@given(st.text("abcd") | st.text())
+def test_run_length_compression_roundtrip(x):
+    assert run_length_decoder(run_length_encoder(x)) == x

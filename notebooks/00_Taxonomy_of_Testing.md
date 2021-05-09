@@ -5,11 +5,11 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.2'
-      jupytext_version: 1.9.1
+      jupytext_version: 1.5.0
   kernelspec:
-    display_name: Python [conda env:.conda-testing-tutorial]
+    display_name: Python [conda env:testing-tutorial]
     language: python
-    name: conda-env-.conda-testing-tutorial-py
+    name: conda-env-testing-tutorial-py
 ---
 
 # Traversing the Taxonomy of Testing
@@ -265,8 +265,121 @@ We will dive into the process of describing data in rich ways using these in the
 Prior to doing so, we will use our nascent understanding of Hypothesis to round out the taxonomy of tests, and study fuzz tests and property-based tests.
 <!-- #endregion -->
 
+### Hypothesis Performs Automated Test-Case Reduction
+
+Before proceeding, there is an important feature that Hypothesis offers and that we should come to appreciate.
+Try running the following test:
+
+```python
+from hypothesis import given 
+import hypothesis.strategies as st
+
+# using `given` with multiple parameters
+# `x` is an integer drawn from [0, 10]
+# `y` is an integer drawn from [20, 30]
+@given(x=st.integers(0, 10), y=st.integers(20, 30))
+def test_demonstrating_the_given_decorator(x, y):
+    assert 0 <= x <= 10
+    
+    # `y` can be any value in [20, 30]
+    # this is a bad assertion: it should fail!
+    assert 20 <= y <= 25
+```
+
+```python
+test_demonstrating_the_given_decorator()
+```
+
+Hypothesis should report:
+
+```
+Falsifying example: test_demonstrating_the_given_decorator(
+    x=0, y=26,
+)
+```
+
+It may seem lucky that it reported the smallest value for `y` that violates the bad inequality, but it is not luck at all!
+This is a feature of Hypothesis known as **automated test-case reduction**.
+That is, `given` decorator strives to report the "simplest" set of input values that produce a given error.
+It does this through the process of **shrinking**.
+
+Each of Hypothesis' strategies has its own prescribed shrinking behavior. For the integers strategy, this means identifying the integer closest to 0 that produces the error at hand.
+
+When running the above test, Hypothesis could have encountered the following sequence of examples during its shrinking phase:
+
+```
+x=0   y=20 - PASSED
+x=0   y=20 - PASSED
+x=0   y=20 - PASSED
+x=9   y=20 - PASSED
+x=9   y=21 - PASSED
+x=3   y=20 - PASSED
+x=3   y=20 - PASSED
+x=9   y=26 - FAILED
+x=3   y=26 - FAILED
+x=6   y=26 - FAILED
+x=10  y=27 - FAILED
+x=7   y=27 - FAILED
+x=3   y=30 - FAILED
+x=3   y=23 - PASSED
+x=10  y=30 - FAILED
+x=3   y=27 - FAILED
+x=3   y=27 - FAILED
+x=2   y=27 - FAILED
+x=0   y=27 - FAILED
+x=0   y=26 - FAILED
+x=0   y=21 - PASSED
+x=0   y=25 - PASSED
+x=0   y=22 - PASSED
+x=0   y=23 - PASSED
+x=0   y=24 - PASSED
+x=0   y=26 - FAILED
+```
+
+See that Hypothesis has to do a semi-random search to identify the boundaries of the fail case; it doesn't know if `x` is causing the error, or if `y` is the culprit, or if it is specific combinations of x and y that causes the failure!
+Despite this complexity, the pairs of variables are successfully shrunk to the simplest fail case.
+
+
+### Hypothesis will Save Falsifying Examples:
+
+Albeit an advanced detail, it is important to note that Hypothesis does not have to search for falsifying examples from scratch every time we run a test function. Instead, Hypothesis will save a database of falsifying examples associated with each of your project's test functions. The database is saved under .hypothesis in whatever directory your test functions were run from.
+
+This ensures that, once Hypothesis finds a falsifying example for a test, the falsifying example will be passed to your test function each time you run it, until it no longer raises an error in your code (e.g. you update your code to fix the bug that was causing the test failure).
+
+
+<div class="alert alert-info">
+
+**Exercise: Understanding How Hypothesis Works**
+
+Create the file `tests/test_with_hypothesis.py`.
+
+Copy the `test_demonstrating_the_given_decorator` function from above - complete with the failing assertion - and add a print statement to the body of the function, which prints out the value for `x` and `y`.
+
+Run the test once and make note of the output that is printed. Consider copying and pasting the output to a notepad for reference. Next, rerun the test multiple times and make careful note of the printed output. What do you see? Is the output different from the first run? Does it differ between subsequent runs? Try to explain this behavior.
+
+In your file browser, navigate to the directory from which you are running this test; if you are following along in a Jupyter notebook, this is simply the directory containing said notebook. You should see a `.hypothesis` directory. As noted above, this is the database that contains the falsifying examples that Hypothesis has identified. Delete the `.hypothesis` directory and try re-running your test? What do you notice about the output now? You should also see that the `.hypothesis` directory has reappeared. Explain what is going on here.
+</div>
+
+
+
+
+
+
+<div class="alert alert-info">
+
+**Exercise: Fixing the Failing Test**
+
+Update the body of test_demonstrating_the_given_decorator so that it no longer fails. Run the fixed test function. How many times is the test function actually be executed when you run it?
+</div>
+
+
+
+
+
 <!-- #region -->
-## Fuzzing
+**Now back to studying different styles of testing!** 
+
+## Fuzz Testing
 
 Fuzz testing is a simple, but often (embarrassingly) powerful approach to automated testing in which we feed a function a wide variety of randomly-generated inputs to see if it ever crashes.
 For example, the following test "fuzzes" the `int` type with finite float inputs, to see if `int(<finite-float>)` ever causes a crash.
@@ -277,7 +390,7 @@ def test_fuzz_in_with_finite_floats(x):
     int(x)  # no asserts needed!
 ```
 
-while this test doesn't do much to assure us that `int` casts floats _correctly_, it is nonetheless a very simple and expressive test that gives us confidence that feeding a finite float will never cause `int` to crash.
+while this test doesn't do much to assure us that `int` casts floats *correctly*, it is nonetheless a very simple and expressive test that gives us confidence that feeding a finite float will never cause `int` to crash.
 We should appreciate just how trivial it is to write this test.
 
 Fuzzing can be especially useful if we have our source code with internal internal `assert` statements.
@@ -522,12 +635,3 @@ From the outset your test should fail, since the function hasn't been implemente
 
 Once you are satisfied with your property-based test for `leftpad`, proceed to complete your implementation of the function and use your test to drive your development (e.g. rely on it to tell you if you have gotten something wrong or have missed any edge cases). 
 <!-- #endregion -->
-```python
-@given(st.integers(0))
-def test_range(n):
-    assert len(range(n)) == n
-```
-
-```python
-test_range()
-```

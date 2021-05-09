@@ -65,6 +65,8 @@ Note that it is always advisable to specify the parameters of `given` as keyword
 
 Write a test that takes in a parameter `x`, that is a boolean value. Use the [`st.booleans()` strategy](https://hypothesis.readthedocs.io/en/latest/data.html#hypothesis.strategies.booleans) to describe the data. In the body of the test, assert that `x` is either `True` or `False`.
 
+Note that the `booleans()` strategy shrinks to `False`. 
+    
 Run your test, and try mutating it to ensure that it can fail appropriately.
 
 </div>
@@ -173,7 +175,10 @@ test_even_ints()
 
 **Exercise: Getting creative with the `.map` method**
 
-Construct a Hypothesis strategy that produces either the string `"cat"` or the string `"dog"`. Then write a test that checks the property of this strategy and run it
+Construct a Hypothesis strategy that produces either the string `"cat"` or the string `"dog"`.
+Write it so that the strategy shrinks to `"dog"`.
+
+Then write a test that checks the property of this strategy and run it
 
 </div>
 
@@ -308,6 +313,8 @@ There are a number critical Hypothesis strategies for us to become familiar with
  
 **`st.lists(...)` is the strategy of choice anytime we want to generate sequences of varying lengths with elements that are, themselves, described by strategies**. Recall that we can always apply the `.map` method if we want a different type of collection (e.g. a `tuple`) other than a list.
 
+This strategy shrinks towards smaller lists with simpler values.
+
 Use `print_examples` to build an intuition for this strategy.
 
 
@@ -350,6 +357,8 @@ test_even_lists()
  - the "width" of the floats; e.g. if you want to generate 16-bit or 32-bit floats vs 64-bit
    (while Python `float`s are always 64-bit, `width=32` ensures that the generated values can
    always be losslessly represented in 32 bits.  This is mostly useful for Numpy arrays.)
+
+This strategy shrinks towards 0.
 
 
 <div class="alert alert-info">
@@ -433,6 +442,8 @@ test_fixed_inequality()
 
 The [st.tuples](https://hypothesis.readthedocs.io/en/latest/data.html#hypothesis.strategies.tuples) strategy accepts $N$ Hypothesis strategies, and will generate length-$N$ tuples whose elements are drawn from the respective strategies that were specified as inputs.
 
+This strategy shrinks towards simpler entries.
+
 For example, the following strategy will generate length-3 tuples whose entries are: even-valued integers, booleans, and odd-valued floats:
 
 ```python
@@ -444,9 +455,11 @@ my_tuples = st.tuples(
 print_examples(my_tuples, 4)
 ```
 
+### [`st.just()`](https://hypothesis.readthedocs.io/en/latest/data.html#hypothesis.strategies.just)
+
 [st.just](https://hypothesis.readthedocs.io/en/latest/data.html#hypothesis.strategies.just) is a strategy that "just" returns the value that you fed it. This is a convenient strategy that helps us to avoid abusing the use of `.map` to concoct particular strategies.
 
-
+<!-- #region -->
 <div class="alert alert-info">
 
 **Exercise: Describing the shape of an array of 2D vectors**
@@ -455,9 +468,11 @@ Write a strategy that describes the shape of an array (i.e. a tuple of integers)
 E.g. `(5, 2)` is the shape of the array containing five two-dimensional vectors.
 Avoid using `.map()` in your solution.    
 
+    
 Use `print_examples` to examine the outputs.
 </div>
 
+<!-- #endregion -->
 
 ```python
 # <COGINST>
@@ -493,6 +508,8 @@ is equivalent to:
 ```python
 st.one_of(st.integers(), st.floats(), st.booleans())
 ```
+
+This strategy shrinks with preference for the left-most strategy.
 <!-- #endregion -->
 
 <div class="alert alert-info">
@@ -516,6 +533,21 @@ print_examples(squares_or_cubes, 5)
 ```
 
 <!-- #region -->
+### [`st.text()`](https://hypothesis.readthedocs.io/en/latest/data.html#hypothesis.strategies.text)
+
+
+The `st.text` accepts an "alphabet" – a collection of string-characters – from which it will construct strings of varying lengths, whose bounds can be specified by the user.
+This strategy shrinks towards shorter strings.
+
+For example, the following strategy will strings of lowercase vowels from length 2 to length 10:
+
+```python
+>>> st.text("aeiouy", min_size=2, max_size=10).example()
+'oouoyoye'
+```
+<!-- #endregion -->
+
+<!-- #region -->
 ### [`st.fixed_dictionaries()`](https://hypothesis.readthedocs.io/en/latest/data.html#hypothesis.strategies.fixed_dictionaries)
 
 `st.fixed_dictionaries` takes a mapping of the form `key -> strategy` and returns a strategy according to that mapping. E.g.
@@ -528,12 +560,24 @@ print_examples(squares_or_cubes, 5)
 ```
 
 will draw values that are either integers or list of integers. 
+
+This strategy shrinks towards simpler keys and values.
 <!-- #endregion -->
 
+<!-- #region -->
 ### [`st.sampled_from`](https://hypothesis.readthedocs.io/en/latest/data.html#hypothesis.strategies.sampled_from)
 
-Finally, [`st.sampled_from`](https://hypothesis.readthedocs.io/en/latest/data.html#hypothesis.strategies.sampled_from) accepts a collection of objects. The strategy will return values that are sampled from this collections.
+[`st.sampled_from`](https://hypothesis.readthedocs.io/en/latest/data.html#hypothesis.strategies.sampled_from) accepts a collection of objects. The strategy will return a value that is sampled from this collection.
 
+For example, the following strategy will sample a value `0`, `"a"`, or `(2, 2)` from a list:
+
+```python
+>>> st.sampled_from([0, "a", (2, 2)]).example()
+'a'
+```
+
+This strategy shrinks towards the first element among the samples.
+<!-- #endregion -->
 
 <div class="alert alert-info">
 
@@ -743,18 +787,238 @@ test_interactive_draw_skills()
 # </COGINST>
 ```
 
-```python
-st.fixed_dictionaries(dict(age=st.integers(0, 89), height=st.floats(3, 7))).example()
-```
+### `.flatmap`
+
+`flatmap` is a method enables us to define a strategy based on a value drawn from a previous strategy.
+
+For example, the following strategy produces lists of integers where each list is guaranteed to have a length that is a perfect square (e.g. a length of 0, 1, 4, 16, 25, ...)
 
 ```python
+perfect_squares = st.integers(min_value=0, max_value=6).map(lambda x: x ** 2)
 
+sqr_len_lists = perfect_squares.flatmap(
+    lambda x: st.lists(st.integers(), min_size=x, max_size=x)
+)
 ```
+
+## Writing Your Own Hypothesis Strategies with @composite
+
+Hypothesis provides the [@composite](https://hypothesis.readthedocs.io/en/latest/data.html#hypothesis.strategies.composite) decorator, which permits us to form our own strategies for describing data by composing Hypothesis' built-in strategies. Let's see this in action by writing a strategy that will produce the bounds for a 1D interval.
 
 ```python
-- text
-- dictionaries
-- builds
-- infer_type
-- recipes
+from typing import Any, Callable, Optional, Tuple
+from hypothesis.strategies import composite
+import hypothesis.strategies as st
+from math import inf
+
+
+@composite
+def interval_bounds(draw, left_bnd=-inf, right_bnd=inf, min_size=0.0):
+    """A Hypothesis data strategy for generating ordered bounds on the real number line.
+    
+    Note: The `draw` parameter it reserved by Hypothesis and is not exposed by
+    the function signature.
+    
+    Parameters
+    ----------
+    left_bnd : float, optional (default=-inf)
+        If specified, the smallest value that the left-bound can take on.
+    
+    right_bnd : float, optional (default=inf)
+        If specified, the largest value that the right-bound can take on.
+    
+    min_size : float, optional (default=0.0)
+        The guaranteed minimum separateion of the bounds.
+    
+    Returns
+    -------
+    st.SearchStrategy[Tuple[float, float]]
+    """
+    if right_bnd < left_bnd + min_size:
+        raise ValueError(
+            f"Unsatisfiable bounds: [left_bnd={left_bnd}, right_bnd={right_bnd}], "
+            f"min-interval size: {min_size}"
+        )
+
+    # `drawn_left` is a float
+    drawn_left = draw(
+        st.floats(
+            min_value=left_bnd,
+            max_value=(None if right_bnd is None else right_bnd - min_size),
+            allow_nan=False,
+        )
+    )
+
+    # `drawn_right` is a float
+    drawn_right = draw(
+        st.floats(min_value=drawn_left + min_size, max_value=right_bnd, allow_nan=False)
+    )
+
+    # ensure that strategy behaves as-promised
+    assert left_bnd <= drawn_left <= right_bnd
+    assert left_bnd <= drawn_right <= right_bnd
+    assert drawn_left + min_size <= drawn_right
+
+    # Note that a composite strategy definition should return the drawn values,
+    # and *not* Hypothesis strategies.
+    #
+    # E.g. here we return a tuple of floating point numbers, and
+    # *not* `st.tuples(st.floats(), st.floats())`
+    return (drawn_left, drawn_right)
 ```
+
+The first argument, `draw`, is required by the `@composite` decorator. It is a function that is used by Hypothesis to draw values from strategies in order to generate data from our composite strategy. Each draw simply produces a value from that strategy. Thus `drawn_left` and `drawn_right` are simply floating point numbers. We then simply return a tuple of these floats, as expected from this strategy.
+
+Note that, even though the resulting function `interval_bounds()` is a Hypothesis search strategy, the return statement in its definition *specifies what values are to be returned*. It does *not* return strategy-instances.
+
+As mentioned in the docstring, the `draw` parameter is not actually exposed in the function signature of `interval_bounds`, once defined. Print the docstring for `interval_bounds` and see that the `draw` parameter is absent from the signature:
+
+
+Experiment with this strategy and see that it behaves as-expected. Start by calling `.example()` on it. Be sure to provide different arguments to the strategy.
+
+```python
+print(f"interval_bounds().example(): {interval_bounds().example()}")
+print(f"interval_bounds(-1, 2, min_size=1).example(): {interval_bounds(-1, 2, min_size=1).example()}")
+```
+
+Lastly, note the presence of the assertions within the composite strategies.
+We will presumably be using this strategy to describe data for tests. Writing a buggy strategy - one that generates incorrect or unexpected data - is a terrible thing; this will, at best lead, to a headache. At worst, it mask bugs in the code that we are testing. 
+
+**If there is ever a time to be fastidious with type/value checking and correctness assertions, it is at the interfaces of a custom Hypothesis strategy!**
+It is also sensible to write tests for your strategies if they are sufficiently sophisticated.
+
+<!-- #region -->
+<div class="alert alert-info">
+
+**Exercise: Write a "quadrilateral corners" strategy**
+
+Use the `@composite` decorator to write the `quad_corners` strategy. Here is the docstring for this strategy:
+
+```python
+"""
+A Hypothesis strategy for four corners of a quadrilateral.
+
+The corners are guaranteed to have counter-clockwise ("right-handed") ordering.
+
+Parameters
+----------
+corner_magnitude : float, optional (default=1e6)
+    The maximum size - in magnitude - that any of the coordinates
+    can take on.
+
+min_separation : float, optional (default=1e-2)
+    The smallest guaranteed margin between two consecutive corners along a
+    single dimension.
+
+Returns
+-------
+SearchStrategy[np.ndarray]
+   shape-(4, 2) array of four ordered pairs (float-64)
+"""
+```
+
+</div>
+
+Feel free to work with a neighbor on this. How general is your strategy?
+Did you bake in any underlying assumptions about the structure or ordering of the data that isn't explicitly part of the strategy's description?
+
+If you do sport some unintentional structure to the data you are generating, and which you need to randomize, *do not reach for the `random` module to mix things up*.
+Rather, find a Hypothesis strategy that can do the stirring for you.
+
+While Hypothesis does track/control random seeds so that it can replay tests accurately, it will not be able to shrink your custom strategy effectively if you seek randomness from outside of Hypothesis' strategies.
+<!-- #endregion -->
+
+```python
+# Define the `quad_corners` strategy
+# <COGINST>
+import hypothesis.strategies as st
+import numpy as np
+
+
+@st.composite
+def quad_corners(
+    draw, *, corner_magnitude=1e6, min_separation=0.01
+) -> st.SearchStrategy[np.ndarray]:
+    """
+    Returns as hypothesis search strategy for four corners of a quadrilateral.
+    The corners are guaranteed to have counter-clockwise ("right-handed") ordering.
+
+    Parameters
+    ----------
+    corner_magnitude : float, optional (default=1e6)
+        The maximum size - in magnitude - that any of the coordinates
+        can take on.
+
+    min_separation : float, optional (default=1e-2)
+        The smallest guaranteed margin between two corners along a
+        single dimension.
+
+    Returns
+    -------
+    SearchStrategy[np.ndarray]
+       shape-(4, 2) array of four ordered pairs (float-64)
+    """
+
+    min_x = draw(st.floats(-corner_magnitude, corner_magnitude))
+    max_x = draw(st.floats(min_separation, corner_magnitude)) + min_x
+
+    min_y = draw(st.floats(-corner_magnitude, corner_magnitude))
+    max_y = draw(st.floats(min_separation, corner_magnitude)) + min_y
+
+    shift = draw(st.integers(min_value=0, max_value=3))
+
+    # lower-left -> lower-right -> upper-right -> upper-left
+    array_corners = np.array(
+        [(min_x, min_y), (max_x, min_y), (max_x, max_y), (min_x, max_y)]
+    )
+
+    # "roll" the ordering of the points such that the "upper-left" point
+    # does not always come first, however the right-handed ordering of
+    # the corners is preserved
+    array_corners = np.roll(array_corners, shift=shift, axis=0)
+
+    return array_corners
+
+
+# </COGINST>
+```
+
+<!-- #region -->
+## Extra: Recipes with Strategies
+
+It can be surprising to see some of the rich descriptions of data that we can produce by combining these primitive strategies in creative ways.
+
+Here is one interesting recipe
+
+```python
+from typing import Any, Tuple, Type, Union
+
+def everything_except(
+    excluded_types: Union[Type[type], Tuple[Type[type], ...]]
+) -> st.SearchStrategy[Any]:
+    return (
+        st.from_type(type)
+        .flatmap(st.from_type)
+        .filter(lambda x: not isinstance(x, excluded_types))
+    )
+```
+
+This strategy will draw values from *any* strategy associated with *any* type that has been registered with `st.register_type_strategy()`, except for values that belong to `excluded_types`.
+
+```python
+>>> [everything_except(int).example() for _ in range(5)]
+00:00:00
+<memory at 0x000002815A491940>
+None
+set()
+2183-03-08
+```
+
+How does this work? `st.from_type(type)` returns a strategy that draws *types* (e.g. `int`, `str`).
+Then this type gets fed to `st.from_type(...)` via `.flatmap`, and thus a strategy is returned for drawing instances of that type.
+Lastly, we filter any values that belong to the excluded type.
+This is a pretty neat strategy for testing the strength of your code's input validation!
+
+Another interesting takeaway from this recipe is the fact that you don't necessarily need to use `st.composite` to write your own strategy!
+Here we simply wrote a function that returns our specific strategy.
+<!-- #endregion -->
