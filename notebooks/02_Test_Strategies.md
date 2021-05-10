@@ -329,8 +329,8 @@ We can fix the numerical instability by recognizing a metamorphic relationship t
 
 \begin{align}
 softmax([s_{k} - a]_{k=1}^{M}) &= \Bigl [ \frac{e^{s_k - a}}{\sum_{i=1}^{M}{e^{s_i - a}}} \Bigr ]_{k=1}^{M}\\
-&= \Bigl [ \frac{e^{-a}e^{s_k}}{e^{-a}\sum_{i=1}^{M}{e^{s_i}}} \Bigr ]_{k=1}^{M}
-&= \Bigl [ \frac{e^{s_k}}{\sum_{i=1}^{M}{e^{s_i}}} \Bigr ]_{k=1}^{M}
+&= \Bigl [ \frac{e^{-a}e^{s_k}}{e^{-a}\sum_{i=1}^{M}{e^{s_i}}} \Bigr ]_{k=1}^{M}\\
+&= \Bigl [ \frac{e^{s_k}}{\sum_{i=1}^{M}{e^{s_i}}} \Bigr ]_{k=1}^{M}\\
 &= softmax([s_{k}]_{k=1}^{M})
 \end{align}
 
