@@ -340,5 +340,8 @@ Update your definition of `softmax` and see that your property-based tests now p
 
 Reflect on the fact that using Hypothesis to drive a property-based test lead us to identify a subtle-but-critical oversight in our function.
 Had we simply manually tested our function with known small inputs and outputs, we might not have discovered this issue.
+    
+Are there any other properties that we could test here?
+Consider how to set that the respective ordering of the input and output are the same (e.g. `numpy.argsort` can get at this).
 </div>
 <!-- #endregion -->
