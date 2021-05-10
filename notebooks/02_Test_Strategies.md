@@ -159,6 +159,7 @@ Often times this comes in the form of a slow function (e.g. single-threaded) vs 
 - `f_singlethread()` vs `f_multithread()`
 - `func()` vs `numba.njit(func)()`
 - `numpy.matmul()` vs `torch.matmul()`
+- `numpy.einsum(..., optimize=False)` vs `numpy.einsum(..., optimize=True)`
 
 
 
