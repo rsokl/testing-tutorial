@@ -1,5 +1,5 @@
 # An Introduction to Methods for Doing Test-Driven Research
-> Created by: Zac Dodds adn Ryan Soklaski
+> Created by: Zac Dodds and Ryan Soklaski
 
 This tutorial is designed to introduce attendees to (the wonderful world of) automated testing in Python 
 – specifically for data science applications.
