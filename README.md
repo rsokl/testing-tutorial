@@ -30,16 +30,20 @@ Along with a short break in the middle, I find this pattern balances content, pr
 
 
 ## Syllabus
-The material will be offered as a three-hour session. There will be a mixture of lectures with hands-on exercises. The following topics will be explored:
+The material will be offered as a two and a half hour session.
+There will be a mixture of lectures with hands-on exercises.
+The following topics will be explored:
 
- ### Property-Based Testing 101
-  - PLACEHOLDER
+### Property-Based Testing 101
+  - In this section we will take a tour through the taxonomy of testing: encountering manual tests, parameterized tests, and property-based tests. In the meanwhile, we will be introduced to the testing library Hypothesis, which provides us with automated test-case generation and reduction.
 
 ### Describe your Data
-  - PLACEHOLDER
+  - It is often the case that the process of *describing our data* is by far the heaviest burden that we must bear when writing tests. This process of assessing "what variety of values should I test?", "have I thought of all the important edge-cases?", and "how much is 'enough'?" will crop up with nearly every test that we write. [Hypothesis](https://hypothesis.readthedocs.io/) is a powerful Python library that empowers us to write a _description_ (specification, to be more precise) of the data that we want to use to exercise our test.
+It will then *generate* test cases that satisfy this description and will run our test on these cases.
+Let's witness this in its most basic form.
 
 ### Common Tests
-  - PLACEHOLDER
+  - In this section, we will put Hypothesis startegies for describing data to good use and discuss some common tactics for writing effective property-based tests for our code. This will familiarize with certain patterns and properties - e.g. roundtrip pairs, equivalent functions, metamorphic relationships - to look for when crafting property-based tests for our code.
 
 ### Putting it into Practice
   - PLACEHOLDER

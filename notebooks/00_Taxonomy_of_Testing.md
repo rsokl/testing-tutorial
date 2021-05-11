@@ -14,8 +14,13 @@ jupyter:
 
 # Traversing the Taxonomy of Testing
 
+In this section we will take a tour through the taxonomy of testing: encountering manual tests, parameterized tests, and property-based tests.
+In the meanwhile, we will be introduced to the testing library Hypothesis, which provides us with automated test-case generation and reduction.
 
-We expect your to write your to write pytest-style tests, which is exemplified by `test_count_vowels`, which can be found below.
+
+## Getting Started
+
+We expect your to write your to write pytest-style tests, which is exemplified by `test_count_vowels`, which can be found below at the beginning of the Manual Tests section.
 All this entails is defining a function that has the word "test" in its name, and place it in a Python script that has the word test in *its* name, in order for pytest to find-and-run that test function.
 
 You can run these tests from the terminal with:
