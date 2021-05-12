@@ -75,8 +75,7 @@ g(f(x)) == x
 The "roundtrip" property is a wonderful thing to test; such a test is simple to write, permits very flexible/complicated inputs, and tests for correctness in a meaningful way.
 
 Note that we can often choose the direction of the roundtrip that we test; e.g. `f(g(x)) == x` vs `g(f(x)) == x`.
-You might pick the roundtrip direction by considering which function of the pair - `f` of `g` - has an input that is easier to describe using Hypothesis' strategies.
- 
+You might pick the roundtrip direction by considering which function of the pair - `f` of `g` - has an input that is easier to describe using Hypothesis' strategies. 
 
 <!-- #region -->
 <div class="alert alert-info">
@@ -154,7 +153,7 @@ There is a tradeoff to be managed here.
 
 **Exercise: Ghostwriting a simple roundtrip**
     
-Run the following command to test [the `gzip` module](https://docs.python.org/3/library/gzip.html)
+Run the following command in your terminal, to test [the `gzip` module](https://docs.python.org/3/library/gzip.html)
 
 ```shell
 hypothesis write gzip.compress
@@ -187,7 +186,7 @@ hypothesis write json.dumps
     
 and inspect the output.  What changes might you make to improve this test?  For example:
 
-- defining a `st.recursive()` strategy to generate JSON objects (for the `obj` argument)
+- [defining a `st.recursive()` strategy](https://hypothesis.readthedocs.io/en/latest/data.html#hypothesis.strategies.recursive) to generate [JSON objects](https://www.json.org/) (for the `obj` argument)
 - improving other input strategies, or removing those for `loads()`
 - removing or updating comments
 - using descriptive variable names
@@ -210,7 +209,11 @@ Often times this comes in the form of a slow function (e.g. single-threaded) vs 
 - `numpy.matmul()` vs `torch.matmul()`
 - `numpy.einsum(..., optimize=False)` vs `numpy.einsum(..., optimize=True)`
 
+We can also use function which are equivalent for *some* of their possible inputs.  For example, `numpy.asarray` converts the input to a `ndarray`, while `numpy.asanyarray` passes array-like types (such as sparse arrays, xarray DataArrays, etc) through unchanged.  We can use the ghostwriter to check that *if passed an `ndarray`*, these functions are equivalent:
 
+```python
+! hypothesis write --equivalent numpy.asarray numpy.asanyarray
+```
 
 <!-- #region -->
 ### Metamorphic Relationships
