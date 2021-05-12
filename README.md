@@ -17,7 +17,7 @@ This tutorial is designed to introduce attendees to (the wonderful world of) aut
 
 ## Introduction
 
-This tutorial is designed to promote simple but powerful methods for bolstering your software-based work/research with 
+This tutorial is designed to promote simple but powerful methods for bolstering your software-based work/research with
 property-based testing, and thereby help to close the aperture on “the things that could go wrong” because of your code.
 It is structured as four blocks, each consisting of a short talk, live-coded demo, and extensive exercises for attendees:
 1. Property-Based Testing 101: core concepts and the core of the Hypothesis library
@@ -26,7 +26,7 @@ It is structured as four blocks, each consisting of a short talk, live-coded dem
 4. Putting it into Practice: use what you've learned to find real bugs in a real project!
 
 Each of these blocks runs for 40-60 minutes, consisting of a 5-15 minute presentation, around 5-10 minutes live-coding demo, and guided exercises.
-Along with a short break in the middle, I find this pattern balances content, practice, and focus well for most classes.
+Along with a short break in the middle, we find this pattern balances content, practice, and focus well for most classes.
 
 
 ## Syllabus
@@ -66,19 +66,25 @@ You will need the to install the following packages to complete this tutorial:
 - pytest
 - hypothesis
 
-To create a mini-conda environment for this tutorial, in your terminal execute:
+You can [create and activate a virtual environment](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/#creating-a-virtual-environment)
+for the tutorial (optional but recommended), and then
+
+```shell
+> pip install notebook numpy pytest hypothesis[cli]
+```
+
+OR, to create a mini-conda environment for this tutorial, in your terminal execute:
 
 ```shell
 > conda create -n test-tutorial python=3.8
 > conda activate test-tutorial
-> conda install notebook numpy pytest hypothesis
-> pip install mygrad
+> conda install notebook numpy pytest hypothesis[cli]
 ```
 
 ## For Instructors
 
-The source material for this tutorial is written in [jupytext-markdown](https://jupytext.readthedocs.io/en/latest/formats.html#jupytext-markdown) in lieu of native Jupyter notebooks. 
+The source material for this tutorial is written in [jupytext-markdown](https://jupytext.readthedocs.io/en/latest/formats.html#jupytext-markdown) in lieu of native Jupyter notebooks.
 These are markdown files that can be opened as Jupyter notebooks.
 These markdown notebooks contain both the exercises and solutions.
-To convert these files to Jupyter notebooks to be distributed to the students, with the solutions excised, we are using the [cogbooks](https://github.com/CogWorksBWSI/Cogbooks) tool, which can be installed with: `pip install cogbooks` 
+To convert these files to Jupyter notebooks to be distributed to the students, with the solutions excised, we are using the [cogbooks](https://github.com/CogWorksBWSI/Cogbooks) tool, which can be installed with: `pip install cogbooks`
 

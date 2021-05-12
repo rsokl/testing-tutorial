@@ -150,6 +150,55 @@ There is a tradeoff to be managed here.
 </div>
 <!-- #endregion -->
 
+<div class="alert alert-info">
+
+**Exercise: Ghostwriting a simple roundtrip**
+    
+Run the following command to test [the `gzip` module](https://docs.python.org/3/library/gzip.html)
+
+```shell
+hypothesis write gzip.compress
+```
+    
+and inspect the output.  What changes might you make to improve this test?  For example:
+    
+- improving input strategies
+- removing or updating comments
+- using descriptive variable names
+    
+Run your improved test to confirm that it works as you expect.
+    
+Bonus round: the `mtime` argument was added to `gzip.compress()` in Python 3.8.  Could you write version-independent tests, or think of extra properties that it enables?
+
+```python
+# Execute this cell to see the CLI output
+! hypothesis write gzip.compress
+```
+
+<div class="alert alert-info">
+
+**Exercise: Ghostwriting a more complex roundtrip**
+    
+Run the following command to test [the `json` module](https://docs.python.org/3/library/json.html)
+
+```shell
+hypothesis write json.dumps
+```
+    
+and inspect the output.  What changes might you make to improve this test?  For example:
+
+- defining a `st.recursive()` strategy to generate JSON objects (for the `obj` argument)
+- improving other input strategies, or removing those for `loads()`
+- removing or updating comments
+- using descriptive variable names
+    
+Extension: use `assume(obj == obj)` instead of excluding `nan` from your JSON strategy.  What happens?
+
+```python
+# Execute this cell to see the CLI output
+! hypothesis write json.dumps
+```
+
 ### Equivalent Functions
 
 There are times where we are fortunate enough to have access to two distinct functions that are meant to exhibit the same behavior.
@@ -300,7 +349,7 @@ def pairwise_dists(x, y):
 
 **Exercise: Testing the softmax function**
 
-The so-called "softmax" function is a means of normalizing a set of numbers such that **they will have the properties of a probability distribution**. I.e., post-softmax, each number will reside in $[0, 1]$ and the resulting numbers will sum to $1$.
+The so-called "softmax" function is a generalised argmax, used to normalize a set of numbers such that **they will have the properties of a probability distribution**. I.e., post-softmax, each number will reside in $[0, 1]$ and the resulting numbers will sum to $1$.
 
 The softmax of a set of $M$ numbers is:
 
@@ -345,3 +394,7 @@ Are there any other properties that we could test here?
 Consider how to set that the respective ordering of the input and output are the same (e.g. `numpy.argsort` can get at this).
 </div>
 <!-- #endregion -->
+
+```python
+
+```
