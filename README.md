@@ -28,6 +28,10 @@ It is structured as four blocks, each consisting of a short talk, live-coded dem
 Each of these blocks runs for 40-60 minutes, consisting of a 5-15 minute presentation, around 5-10 minutes live-coding demo, and guided exercises.
 Along with a short break in the middle, we find this pattern balances content, practice, and focus well for most classes.
 
+[You can read through the slides here](https://docs.google.com/presentation/d/1OQLNah25gu_ElpUP0vv379dBDBZXh5LmK6fbnmMJYxM/),
+as a reference for later.  Please work through the exercises for each section before reading ahead!
+
+
 
 ## Syllabus
 The material will be offered as a two and a half hour session.
@@ -46,7 +50,7 @@ Let's witness this in its most basic form.
   - In this section, we will put Hypothesis startegies for describing data to good use and discuss some common tactics for writing effective property-based tests for our code. This will familiarize with certain patterns and properties - e.g. roundtrip pairs, equivalent functions, metamorphic relationships - to look for when crafting property-based tests for our code.
 
 ### Putting it into Practice
-  - PLACEHOLDER
+  - Now that we know how to write property-based tests, in this final section we will cover practical tips for using them as part of a larger project.  Test-suite design patterns, use of performance and determinism settings, reproducing test failures from a CI server, etc; they're all practical topics and typically left out of shorter introductions!
 
 
 ## Prerequisites
