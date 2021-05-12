@@ -3,7 +3,7 @@ from hypothesis import Phase, given, settings, strategies as st
 
 
 # Running
-#       pytest --hypothesis-show-statisticstest_settings.py
+#       pytest --hypothesis-show-statistics tests/test_settings.py
 #
 # will report lines which were always and only run by failing examples.
 # How useful is the report in this case?  Would it be useful on your
