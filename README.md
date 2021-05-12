@@ -1,10 +1,10 @@
-# An Introduction to Methods for Doing Test-Driven Research
+# An Introduction to Property-Based Testing
 > Created by: Zac Dodds and Ryan Soklaski
 
-This tutorial is designed to introduce attendees to (the wonderful world of) automated testing in Python 
+This tutorial is designed to introduce attendees to (the wonderful world of) automated testing in Python
 – specifically for data science applications.
 
-- [An Introduction to Methods for Doing Test-Driven Research](#an-introduction-to-methods-for-doing-test-driven-research)
+- [An Introduction to Property-Based Testing](#an-introduction-to-property-based-testing)
   - [Introduction](#introduction)
   - [Syllabus](#syllabus)
     - [Property-Based Testing 101](#property-based-testing-101)
