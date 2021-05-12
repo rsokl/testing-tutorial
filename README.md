@@ -61,7 +61,7 @@ A complete description of how to do this is detailed in [Module 1 of Python Like
 It is also recommended that you prepare yourself to work in your IDE of choice for Python. If you do not have an IDE that you are comfortable with yet, [Visual Studio code and PyCharm are both highly recommended](https://www.pythonlikeyoumeanit.com/Module1_GettingStartedWithPython/Getting_Started_With_IDEs_and_Notebooks.html).
 
 
-## Creating a Python Environment for this Tutorial
+## Preparing a Python Environment for this Tutorial
 
 You will need the to install the following packages to complete this tutorial:
 
@@ -77,12 +77,28 @@ for the tutorial (optional but recommended), and then
 > pip install notebook numpy pytest hypothesis[cli]
 ```
 
-OR, to create a mini-conda environment for this tutorial, in your terminal execute:
+OR, to create a mini-conda environment for this tutorial, [install mini-conda](https://docs.conda.io/en/latest/miniconda.html) and then, in your terminal, execute:
 
 ```shell
 > conda create -n test-tutorial python=3.8
 > conda activate test-tutorial
 > conda install notebook numpy pytest hypothesis[cli]
+```
+
+In this tutorial, you will be populating your own toy Python project, and will populate code under `./src/pbt_tutorial`.
+Make a "dev-mode" installation of this library in your environment; navigate to the top level of this repo and run:
+
+```shell
+pip install -e .
+```
+
+This command will install `pbt_tutorial` so that any code that you add to it will immediately be reflected in your installation.
+E.g. if you add to `./src/pbt_tutorial/__init__.py` the function `def my_func(): return 1`, then you will be able to import that function:
+
+```python
+>>> from pbt_tutorial import my_func
+>>> my_func()
+1
 ```
 
 ## For Instructors
