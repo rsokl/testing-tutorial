@@ -57,19 +57,6 @@ def test_really_slow(delay):
 test_really_slow()
 ```
 
-<!-- #region -->
-### Settings for Determinism
-
-
-
-- `derandomize`
-- `database`
-<!-- #endregion -->
-
-```python
-
-```
-
 ### The `phases` setting
 
 The phases setting allows you to individually enable or disable [Hypothesis' six phases](https://hypothesis.readthedocs.io/en/latest/settings.html#controlling-what-runs), and has two main uses:
@@ -111,19 +98,33 @@ test_flaky()
 Random search works well... but [guided search with `hypothesis.target()`](https://hypothesis.readthedocs.io/en/latest/details.html#targeted-example-generation)
 is even better.  Targeted search can help
 
-- find rare bugs
+- find rare bugs ([e.g.](https://github.com/astropy/astropy/pull/10373))
 - understand bugs, by mitigating [the "threshold problem"](https://hypothesis.works/articles/threshold-problem/) (where shrinking makes severe bugs look marginal)
 
 ```python
-
+# See `tests/test_settings.py` for this exercise.
 ```
 
 ### Hooks for external fuzzers
 
-https://hypothesis.readthedocs.io/en/latest/details.html#use-with-external-fuzzers
+If you're on Linux or OSX, you may want to [experiment with external fuzzers](https://hypothesis.readthedocs.io/en/latest/details.html#use-with-external-fuzzers).
+For example, [here's a fuzz-test for the Black autoformatter](https://github.com/psf/black/blob/3ef339b2e75468a09d617e6aa74bc920c317bce6/fuzz.py#L75-L85)
+using Atheris as the fuzzing engine.
 
-
+We can mock this up with our own very simple fuzzer:
 
 ```python
+from secrets import token_bytes as get_bytes_from_fuzzer
+from hypothesis import given, strategies as st
 
+
+@given(st.nothing())
+def test(_):
+    pass 
+
+
+# And now for the fuzzer:
+for _ in range(1000):
+    payload = get_bytes_from_fuzzer(1000)
+    test.hypothesis.fuzz_one_input(payload)
 ```
