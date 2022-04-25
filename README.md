@@ -28,7 +28,7 @@ It is structured as four blocks, each consisting of a short talk, live-coded dem
 Each of these blocks runs for 40-60 minutes, consisting of a 5-15 minute presentation, around 5-10 minutes live-coding demo, and guided exercises.
 Along with a short break in the middle, we find this pattern balances content, practice, and focus well for most classes.
 
-[You can read through the slides here](https://docs.google.com/presentation/d/1OQLNah25gu_ElpUP0vv379dBDBZXh5LmK6fbnmMJYxM/),
+[You can read through the slides here](https://docs.google.com/presentation/d/1Yv4hmaJb3CUejX8L3OkYn5Npddukyol18DWoaIxw-8I/),
 as a reference for later.  Please work through the exercises for each section before reading ahead!
 
 

@@ -19,7 +19,6 @@ jobs:
       run: |
         cogbooks -f notebooks/
         rm -r notebooks/*.md
-        rm src/pbt_tutorial/basic_functions.py
         rm tests/test_fuzz.py
         rm tests/test_manual.py
         rm tests/test_metamorphic.py
