@@ -1,5 +1,5 @@
 # An Introduction to Property-Based Testing
-> Created by: Zac Dodds and Ryan Soklaski
+> Created by: Zac Hatfield-Dodds and Ryan Soklaski
 
 This tutorial is designed to introduce attendees to (the wonderful world of) automated testing in Python
 – specifically for data science applications.
@@ -25,16 +25,16 @@ It is structured as four blocks, each consisting of a short talk, live-coded dem
 3. Common Tests: from "does not crash" to "write+read == noop" to 'metamorphic relations'
 4. Putting it into Practice: use what you've learned to find real bugs in a real project!
 
-Each of these blocks runs for 40-60 minutes, consisting of a 5-15 minute presentation, around 5-10 minutes live-coding demo, and guided exercises.
+Each of these blocks runs for 40-60 minutes, consisting of a 5-15 minute presentation, occasional live-coded demos, and guided exercises.
 Along with a short break in the middle, we find this pattern balances content, practice, and focus well for most classes.
 
 [You can read through the slides here](https://docs.google.com/presentation/d/1Yv4hmaJb3CUejX8L3OkYn5Npddukyol18DWoaIxw-8I/),
-as a reference for later.  Please work through the exercises for each section before reading ahead!
+as a reference for later.  At the end of each section, please work through the exercises before reading ahead!
 
 
 
 ## Syllabus
-The material will be offered as a two and a half hour session.
+The material will be offered as a half-day session.
 There will be a mixture of lectures with hands-on exercises.
 The following topics will be explored:
 
@@ -50,7 +50,7 @@ Let's witness this in its most basic form.
 
 ### Common Tests
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/rsokl/testing-tutorial/HEAD?labpath=notebooks%2F02_Test_Strategies_STUDENT.ipynb)
-  - In this section, we will put Hypothesis startegies for describing data to good use and discuss some common tactics for writing effective property-based tests for our code. This will familiarize with certain patterns and properties - e.g. roundtrip pairs, equivalent functions, metamorphic relationships - to look for when crafting property-based tests for our code.
+  - In this section, we will put Hypothesis strategies for describing data to good use and discuss some common tactics for writing effective property-based tests for our code. This will familiarize with certain patterns and properties - e.g. roundtrip pairs, equivalent functions, metamorphic relationships - to look for when crafting property-based tests for our code.
 
 ### Putting it into Practice
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/rsokl/testing-tutorial/HEAD?labpath=notebooks%2F03_Putting_into_Practice_STUDENT.ipynb)
@@ -59,7 +59,7 @@ Let's witness this in its most basic form.
 
 ## Prerequisites
 
-Attendees are expected to have access to a computer with with Python 3.6+ installed on it and should know how to run Jupyter notebooks.
+Attendees are expected to have access to a computer with with Python 3.7+ installed on it and should know how to run Jupyter notebooks.
 A complete description of how to do this is detailed in [Module 1 of Python Like You Meant It](https://www.pythonlikeyoumeanit.com/module_1.html).
 
 It is also recommended that you prepare yourself to work in your IDE of choice for Python. If you do not have an IDE that you are comfortable with yet, [Visual Studio code and PyCharm are both highly recommended](https://www.pythonlikeyoumeanit.com/Module1_GettingStartedWithPython/Getting_Started_With_IDEs_and_Notebooks.html).
