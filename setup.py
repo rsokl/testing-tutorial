@@ -5,8 +5,8 @@ setup(
     description="Library code for property-based testing tutorial",
     packages=find_packages(where="src", exclude=["tests*"]),
     package_dir={"": "src"},
-    version="1.0.0-solutions",
-    python_requires=">=3.6",
+    version="1.1.0",
+    python_requires=">=3.7",
     install_requires=["numpy>=1.11"],
-    tests_requires=["pytest >= 3.8", "hypothesis >= 4.53.2"],
+    tests_requires=["pytest >= 7.1", "hypothesis >= 6.45"],
 )
