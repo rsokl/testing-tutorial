@@ -62,11 +62,11 @@ You can also use the `@example` decorator to add specific edge cases that you wa
 </div>
 
 
-### Rountrip Pairs
+### Roundtrip Pairs
 
 Saving and loading, encoding and decoding, sending and receiving, to-yaml from-yaml: these are all examples of pairs of functions that form "roundtrip" relationships.
 
-```
+```python
 # f and g form a "roundtrip" (i.e. f is g's inverse)
 
 g(f(x)) == x
