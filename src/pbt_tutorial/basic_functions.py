@@ -146,10 +146,12 @@ def run_length_decoder(in_list: List[Union[str, int]]) -> str:
     >>> run_length_decoder(['a', 'a', 5, 'b', 'b', 2, 'c', 'b', 'c'])
     "aaaaabbcbc"
     """
-    out = ""
+    out: str = ""
     for n, item in enumerate(in_list):
         if isinstance(item, int):
-            out += in_list[n - 1] * (item - 2)
+            char = in_list[n - 1]
+            assert isinstance(char, str)
+            out += char * (item - 2)
         else:
             out += item
     return out

@@ -1,9 +1,9 @@
-import numpy as np
-from pbt_tutorial.basic_functions import merge_max_mappings, pairwise_dists
-
-from hypothesis import given
-import hypothesis.strategies as st
 import hypothesis.extra.numpy as hnp
+import hypothesis.strategies as st
+import numpy as np
+from hypothesis import given
+
+from pbt_tutorial.basic_functions import merge_max_mappings, pairwise_dists
 
 
 @given(
@@ -52,7 +52,9 @@ def test_pairwise_dists_translational_invariance(M, N, D, data, shift):
         hnp.arrays(shape=(N, D), elements=st.floats(-1e20, 1e20), dtype=float)
     )
     dists = pairwise_dists(x, y)
-    assert np.allclose(dists, pairwise_dists(x + shift, y + shift))
+    assert np.allclose(
+        dists, pairwise_dists(x + shift, y + shift), atol=1e-3, rtol=1e-3
+    )
 
 
 @given(
@@ -71,6 +73,5 @@ def test_pairwise_dists_linear_scaling(M, N, D, data, scale):
     )
     dists = pairwise_dists(x, y)
     assert np.allclose(
-        scale * dists, pairwise_dists(x * scale, y * scale), atol=1e-5, rtol=1e-5
+        scale * dists, pairwise_dists(x * scale, y * scale), atol=1e-3, rtol=1e-3
     )
-

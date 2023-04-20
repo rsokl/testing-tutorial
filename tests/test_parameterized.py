@@ -1,6 +1,6 @@
 import pytest
 
-from pbt_tutorial import count_vowels, merge_max_mappings
+from pbt_tutorial.basic_functions import count_vowels, merge_max_mappings
 
 
 @pytest.mark.parametrize("size", [0, 1, 2, 3])

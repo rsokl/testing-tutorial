@@ -1,4 +1,4 @@
-from pbt_tutorial import merge_max_mappings, count_vowels
+from pbt_tutorial.basic_functions import count_vowels, merge_max_mappings
 
 
 def test_count_vowels():
@@ -13,9 +13,9 @@ def test_count_vowels():
 
 def test_merge_max_mappings():
     # test documented behavior
-    dict1 = {"a": 1, "b": 2}
-    dict2 = {"b": 20, "c": -1}
-    expected = {"a": 1, "b": 20, "c": -1}
+    dict1 = {"a": 1.0, "b": 2.0}
+    dict2 = {"b": 20.0, "c": -1}
+    expected = {"a": 1.0, "b": 20.0, "c": -1.0}
     assert merge_max_mappings(dict1, dict2) == expected
 
     # test empty dict1

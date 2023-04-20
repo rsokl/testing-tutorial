@@ -1,5 +1,6 @@
-from hypothesis import given, strategies as st, target
-
+from hypothesis import given
+from hypothesis import strategies as st
+from hypothesis import target
 
 # OK, what's going on here?
 #
