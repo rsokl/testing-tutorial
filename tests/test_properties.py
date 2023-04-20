@@ -57,7 +57,9 @@ def test_count_vowels_property_based(in_string: str, include_y: bool, num_repeat
         keys=st.text(), values=st.integers() | st.floats(allow_nan=False)
     ),
 )
-def test_merge_max_mappings_hypothesis(dict1: Dict[str, int], dict2: Dict[str, int]):
+def test_merge_max_mappings_hypothesis(
+    dict1: Dict[str, float], dict2: Dict[str, float]
+):
     merged_dict = merge_max_mappings(dict1, dict2)
 
     # Property 1:

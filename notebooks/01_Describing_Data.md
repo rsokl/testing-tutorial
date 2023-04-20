@@ -633,13 +633,11 @@ st.register_type_strategy(
 (0.7599735905063035-0.6499539535482165j)
 ```
 
-`hypothesis.infer` can be used within `@given` to indicate that an argument's values should be inferred from the annotation from the test's signature.
+`...` (i.e. the `Ellipsis` object) can be used within `@given` to indicate that an argument's values should be inferred from the annotation from the test's signature.
 For example:
 
 ```python
-from hypothesis import infer
-
-@given(x=infer) # uses `from_type(ComplexUnitCircle)`
+@given(x=...) # uses `from_type(ComplexUnitCircle)`
 def test_with_infer(x: ComplexUnitCircle):
     assert isinstance(x, complex)
     assert math.isclose(abs(x), 1)
