@@ -84,7 +84,7 @@ for the tutorial (optional but recommended), and then
 OR, to create a mini-conda environment for this tutorial, [install mini-conda](https://docs.conda.io/en/latest/miniconda.html) and then, in your terminal, execute:
 
 ```shell
-> conda create -n test-tutorial python=3.8
+> conda create -n test-tutorial python=3.10
 > conda activate test-tutorial
 > conda install notebook numpy pytest hypothesis[cli]
 ```
