@@ -4,12 +4,12 @@ jupyter:
     text_representation:
       extension: .md
       format_name: markdown
-      format_version: '1.2'
-      jupytext_version: 1.5.0
+      format_version: '1.3'
+      jupytext_version: 1.14.5
   kernelspec:
-    display_name: Python [conda env:testing-tutorial]
+    display_name: Python 3 (ipykernel)
     language: python
-    name: conda-env-testing-tutorial-py
+    name: python3
 ---
 
 # Common Test Tactics
@@ -61,7 +61,7 @@ Consider using the `st.from_type(type)` and `st.from_type(type).flatmap(st.from_
 You can also use the `@example` decorator to add specific edge cases that you want to test against.
 </div>
 
-
+<!-- #region -->
 ### Roundtrip Pairs
 
 Saving and loading, encoding and decoding, sending and receiving, to-yaml from-yaml: these are all examples of pairs of functions that form "roundtrip" relationships.
@@ -70,7 +70,8 @@ Saving and loading, encoding and decoding, sending and receiving, to-yaml from-y
 # f and g form a "roundtrip" (i.e. f is g's inverse)
 
 g(f(x)) == x
-``` 
+```
+<!-- #endregion -->
 
 The "roundtrip" property is a wonderful thing to test; such a test is simple to write, permits very flexible/complicated inputs, and tests for correctness in a meaningful way.
 
@@ -397,7 +398,3 @@ Are there any other properties that we could test here?
 Consider how to set that the respective ordering of the input and output are the same (e.g. `numpy.argsort` can get at this).
 </div>
 <!-- #endregion -->
-
-```python
-
-```

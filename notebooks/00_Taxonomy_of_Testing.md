@@ -4,12 +4,12 @@ jupyter:
     text_representation:
       extension: .md
       format_name: markdown
-      format_version: '1.2'
-      jupytext_version: 1.5.0
+      format_version: '1.3'
+      jupytext_version: 1.14.5
   kernelspec:
-    display_name: Python [conda env:testing-tutorial]
+    display_name: Python 3 (ipykernel)
     language: python
-    name: conda-env-testing-tutorial-py
+    name: python3
 ---
 
 # Traversing the Taxonomy of Testing
@@ -46,7 +46,7 @@ This is the most rudimentary form of testing that one will encounter in software
 For example, the following is a manual test of `pbt_tutorial.count_vowels`:
 
 ```python
-from pbt_tutorial import count_vowels
+from pbt_tutorial.basic_functions import count_vowels
 
 def test_count_vowels():
     # test basic strings with uppercase and lowercase letters
