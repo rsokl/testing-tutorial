@@ -1,6 +1,7 @@
 import json
-from hypothesis import Phase, given, settings, strategies as st
 
+from hypothesis import Phase, given, settings
+from hypothesis import strategies as st
 
 # Running
 #       pytest --hypothesis-show-statistics tests/test_settings.py

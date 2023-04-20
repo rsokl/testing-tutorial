@@ -1,4 +1,4 @@
-from pbt_tutorial.basic_functions import merge_max_mappings, count_vowels
+from pbt_tutorial.basic_functions import count_vowels, merge_max_mappings
 
 
 def test_count_vowels():

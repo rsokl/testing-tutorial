@@ -1,9 +1,9 @@
-import numpy as np
-from pbt_tutorial.basic_functions import merge_max_mappings, pairwise_dists
-
-from hypothesis import given
-import hypothesis.strategies as st
 import hypothesis.extra.numpy as hnp
+import hypothesis.strategies as st
+import numpy as np
+from hypothesis import given
+
+from pbt_tutorial.basic_functions import merge_max_mappings, pairwise_dists
 
 
 @given(
