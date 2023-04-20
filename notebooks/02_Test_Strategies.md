@@ -219,7 +219,7 @@ We can also use function which are equivalent for *some* of their possible input
 <!-- #region -->
 ### Metamorphic Relationships
 
-A metamorphic relationship is one in which a known transformation made to the input of a function has a *known* and *necessary* affect of the function's output.
+A metamorphic relationship is one in which a known transformation made to the input of a function has a *known* and *necessary* effect of the function's output.
 We already saw an example of this when we tested our `count_vowels` function:
 
 ```python
