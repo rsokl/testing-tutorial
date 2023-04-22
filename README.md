@@ -67,7 +67,7 @@ It is also recommended that you prepare yourself to work in your IDE of choice f
 
 ## Preparing a Python Environment for this Tutorial
 
-You will need the to install the following packages to complete this tutorial:
+You will need to install the following packages to complete this tutorial:
 
 - numpy
 - notebook
