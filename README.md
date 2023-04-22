@@ -12,7 +12,9 @@ This tutorial is designed to introduce attendees to (the wonderful world of) aut
     - [Common Tests](#common-tests)
     - [Putting it into Practice](#putting-it-into-practice)
   - [Prerequisites](#prerequisites)
-  - [Creating a Python Environment for this Tutorial](#creating-a-python-environment-for-this-tutorial)
+  - [Preparing a Python Environment for this Tutorial](#preparing-a-python-environment-for-this-tutorial)
+    - [Creating The New Environment](#creating-the-new-environment)
+    - [Installing Required Packages](#installing-required-packages)
   - [For Instructors](#for-instructors)
 
 ## Introduction
@@ -67,37 +69,83 @@ It is also recommended that you prepare yourself to work in your IDE of choice f
 
 ## Preparing a Python Environment for this Tutorial
 
-You will need to install the following packages to complete this tutorial:
+To complete the tasks in this tutorial you will need to setup a proper python environment.
+These are the big steps you are going to follow:
+
+0. Create a new virtual environment (optional but recomended)
+1. Install all required external and local packages in your new virtual environment
+
+### Creating The New Environment
+
+<details>
+<summary>Create an environment using pip</summary>
+
+The instructions can be found at [create and activate a virtual environment](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/#creating-a-virtual-environment)
+
+> Tip: do not forget to activate your environment after creating it!
+
+</details>
+
+<details>
+<summary>Create an environment using conda</summary>
+
+To create a mini-conda environment for this tutorial, [install mini-conda](https://docs.conda.io/en/latest/miniconda.html) and then, in your terminal, execute:
+
+```shell
+> conda create -n test-tutorial python=3.10 pip
+> conda activate test-tutorial
+```
+
+</details>
+
+&nbsp;
+### Installing Required Packages
+
+At this step you are going to install some external packages and also install a local package located at `src/pbt_tutorial`, so the functions defined there are accessible by our notebooks.
+
+The external packages below will be installed:
 
 - numpy
 - notebook
 - pytest
 - hypothesis
 
-You can [create and activate a virtual environment](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/#creating-a-virtual-environment)
-for the tutorial (optional but recommended), and then
+Navigate to the top level of this repo and than execute the command below to install all required packages:
 
 ```shell
-> pip install notebook numpy pytest hypothesis[cli]
+pip install -r requirements.txt
 ```
 
-OR, to create a mini-conda environment for this tutorial, [install mini-conda](https://docs.conda.io/en/latest/miniconda.html) and then, in your terminal, execute:
+<details>
+<summary>Details on the package installation </summary>
+
+The first line of the `requirements.txt` file provided is
 
 ```shell
-> conda create -n test-tutorial python=3.10
-> conda activate test-tutorial
-> conda install notebook numpy pytest hypothesis[cli]
+-e .
 ```
 
-In this tutorial, you will be populating your own toy Python project, and will populate code under `./src/pbt_tutorial`.
-Make a "dev-mode" installation of this library in your environment; navigate to the top level of this repo and run:
+which  actually means
 
 ```shell
 pip install -e .
 ```
 
-This command will install `pbt_tutorial` so that any code that you add to it will immediately be reflected in your installation.
-E.g. if you add to `./src/pbt_tutorial/__init__.py` the function `def my_func(): return 1`, then you will be able to import that function:
+This command is necessary because in this tutorial, you will be populating your own toy Python project, and will populate code under `./src/pbt_tutorial`.
+
+For this code to be available to import in our notebooks we need to make a "dev-mode" installation of this library in our environment. This is made by navigating to the top level of this repo and running:
+
+```shell
+pip install -e .
+```
+
+The command will install `pbt_tutorial` so that any code that you add to it will immediately be reflected in your installation.
+
+</details>
+
+&nbsp;
+
+After running the command above the code under `./src/pbt_tutorial` will be available to import. so if you add to `./src/pbt_tutorial/__init__.py` the function `def my_func(): return 1`, then you will be able to import that function:
 
 ```python
 >>> from pbt_tutorial import my_func

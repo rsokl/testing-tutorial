@@ -1,3 +1,5 @@
 -e .
+notebook
+numpy >= 1.11
 pytest >= 7.1
 hypothesis >= 6.45
