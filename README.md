@@ -61,6 +61,11 @@ Let's witness this in its most basic form.
 
 ## Prerequisites
 
+This tutorial is for anybody who regularly writes tests in Python, and would like an easier and more effective way to do so.
+We assume that you are comfortable reading, running, and writing traditional unit tests; and familar with ideas like assertions.
+Most attendees will have heard "given, when, then" and "arrange, act, assert".
+You may or may not have heard of pre- and post-conditions - we will explain what "property-based" means without reference to Haskell or anything algebraic.
+
 Attendees are expected to have access to a computer with with Python 3.7+ installed on it and should know how to run Jupyter notebooks.
 A complete description of how to do this is detailed in [Module 1 of Python Like You Meant It](https://www.pythonlikeyoumeanit.com/module_1.html).
 
